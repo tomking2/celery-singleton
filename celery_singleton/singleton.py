@@ -35,9 +35,9 @@ class Singleton(BaseTask):
 
     def lock_and_run(self, lock, args=None, kwargs=None, task_id=None,
                      producer=None, link=None, link_error=None, shadow=None,
-                     **options):
+                     force=False, **options):
         lock_aquired = self.aquire_lock(lock, task_id)
-        if lock_aquired:
+        if lock_aquired or force:
             try:
                 return super(Singleton, self).apply_async(
                     args=args, kwargs=kwargs,
@@ -51,7 +51,8 @@ class Singleton(BaseTask):
                 raise
 
     def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
-                    link=None, link_error=None, shadow=None, revoke=False, **options):
+                    link=None, link_error=None, shadow=None, revoke=False,
+                    force=False, **options):
         args = args or []
         kwargs = kwargs or {}
 
@@ -62,7 +63,7 @@ class Singleton(BaseTask):
             lock, args=args, kwargs=kwargs,
             task_id=task_id, producer=producer,
             link=link, link_error=link_error,
-            shadow=shadow, **options
+            shadow=shadow, force=force, **options
         )
         if task:
             return task
